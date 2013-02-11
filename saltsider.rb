@@ -1,5 +1,41 @@
+require 'json'
+
 class Saltsider
-  # TODO: Fix me
+  RANKS = ['Script Kid', 'n00b', 'Programmer', 'Rock Star', 'l33t',
+    'Saltsider']
+
+  P_ATTRIBUTES = [:name, :email, :phone]
+  S_ATTRIBUTES = [:html, :css, :javascript, :ruby, :ruby_on_rails]
+
+  def initialize(attributes = {})
+    @attributes = normalize_attributes(attributes)
+  end
+
+  def profile
+    Hash[P_ATTRIBUTES.map { |a| [a, @attributes[a]] }]
+  end
+
+  def skills
+    Hash[S_ATTRIBUTES.map { |a| [a, @attributes[a]] }]
+  end
+
+  def valid?
+    ((P_ATTRIBUTES + S_ATTRIBUTES) - @attributes.keys).empty?
+  end
+
+  def to_json
+    JSON.dump(saltsider: profile.merge(skills: skills))
+  end
+
+  def level_of_awesomeness
+    RANKS[skills.values.count(true)]
+  end
+
+  private
+
+  def normalize_attributes(attributes)
+    Hash[attributes.map { |k, v| [k.to_s.gsub('knows_', '').to_sym, v] }]
+  end
 end
 
 describe Saltsider do
